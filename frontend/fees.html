@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>الرسوم الدراسية والخصومات — مدرسة رواد التعليمية</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary:      #683c60;
+      --primary-mid:  #8b5c82;
+      --primary-light:#b57ea5;
+      --secondary:    #f7c8d9;
+      --gold:         #cca54d;
+      --bg:           #fdfbfc;
+      --bg-card:      #ffffff;
+      --text-main:    #2a2027;
+      --text-muted:   #7a6d75;
+      --border:       #f2e9ee;
+      --shadow:       0 8px 32px rgba(104,60,96,.06);
+      --font:         'Cairo', sans-serif;
+      --font-d:       'Tajawal', sans-serif;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary), #462640);
+      padding: 40px 20px; text-align: center; color: #fff;
+    }
+    .header-title { font-family: var(--font-d); font-size: 1.8rem; font-weight: 900; }
+    .header-sub { font-size: .9rem; color: rgba(255,255,255,.7); margin-top: 6px; }
+    
+    .container { max-width: 1000px; width: 100%; margin: 40px auto; padding: 0 20px; flex-grow: 1; }
+    
+    .alert-banner {
+      background: #fff8e8; border: 1px solid #f0d080; border-radius: 12px;
+      padding: 16px 20px; color: #7a5c00; font-size: .88rem; line-height: 1.6;
+      margin-bottom: 30px; display: flex; align-items: flex-start; gap: 10px;
+    }
+    
+    .fees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .fee-card {
+      background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
+      box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
+      transition: .3s; cursor: pointer;
+    }
+    .fee-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(104,60,96,.1); }
+    .fee-img-wrap { width: 100%; aspect-ratio: 4/3; background: #faf4f7; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+    .fee-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .fee-zoom-hint {
+      position: absolute; inset: 0; background: rgba(104,60,96,0.4);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      font-weight: 700; font-size: 1rem; opacity: 0; transition: .2s;
+    }
+    .fee-card:hover .fee-zoom-hint { opacity: 1; }
+    
+    .fee-details { padding: 20px; text-align: center; }
+    .fee-title { font-weight: 800; font-size: 1.1rem; color: var(--primary); margin-bottom: 6px; }
+    .fee-desc { font-size: .84rem; color: var(--text-muted); }
+    
+    .back-btn-wrap { text-align: center; margin-top: 40px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 12px 30px;
+      border-radius: 50px; font-weight: 700; font-size: .95rem; cursor: pointer;
+      transition: .25s; border: none; background: var(--primary); color: #fff;
+      box-shadow: 0 4px 16px rgba(104,60,96,.2);
+    }
+    .btn:hover { background: var(--primary-mid); transform: translateY(-2px); }
+    
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(42,32,39,0.9); backdrop-filter: blur(4px);
+      z-index: 1200; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-content { max-width: 90%; max-height: 90%; position: relative; }
+    .lightbox-content img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+    .lightbox-close { position: absolute; top: -40px; left: 0; color: #fff; font-size: 2rem; cursor: pointer; background: none; border: none; }
+    
+    footer {
+      background: #2b1727; color: rgba(255,255,255,0.6); text-align: center;
+      padding: 30px; font-size: .8rem; border-top: 1px solid rgba(255,255,255,0.05);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1 class="header-title">جدول الرسوم الدراسية</h1>
+  <p class="header-sub">مدرسة رواد التعليمية الأهلية للبنات</p>
+</div>
+
+<div class="container">
+  <div class="alert-banner">
+    <span>💡</span>
+    <div>
+      <strong>تنبيه هام:</strong> هذه الصفحة سرية ومخصصة لأولياء الأمور المستهدفين فقط. يرجى عدم مشاركة الرابط بشكل عام. كما نوفر تسهيلات للدفع وخصومات للتسجيل المبكر والأخوات.
+    </div>
+  </div>
+  
+  <div class="fees-grid" id="feesGrid">
+    <!-- Loaded by JS -->
+  </div>
+  
+  <div id="feesLoading" style="text-align:center;padding:40px;color:var(--text-muted);">
+    جاري تحميل جداول الرسوم...
+  </div>
+  
+  <div class="back-btn-wrap">
+    <a href="/" class="btn">🏠 العودة للصفحة الرئيسية</a>
+  </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-content" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="رسوم مكبرة">
+  </div>
+</div>
+
+<footer>
+  © 2026 مدرسة رواد التعليمية الأهلية للبنات. جميع الحقوق محفوظة.
+</footer>
+
+<script>
+  const API_BASE = '/api';
+  
+  function renderFees(images) {
+    const grid = document.getElementById('feesGrid');
+    document.getElementById('feesLoading').style.display = 'none';
+    
+    if (!images || !images.length) {
+      // Fallback demo images
+      const demoImages = [
+        { url: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=800', filename: 'primary_fees.jpg', title: 'رسوم المرحلة الابتدائية', desc: 'تفاصيل الرسوم وخطة الدفع والأقساط للمرحلة الابتدائية' },
+        { url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800', filename: 'intermediate_fees.jpg', title: 'رسوم المرحلة المتوسطة والثانوية', desc: 'تفاصيل الرسوم والخصومات الأخوية المتاحة' }
+      ];
+      grid.innerHTML = demoImages.map(img => `
+        <div class="fee-card" onclick="openLightbox('${img.url}')">
+          <div class="fee-img-wrap">
+            <img src="${img.url}" alt="${img.title}">
+            <div class="fee-zoom-hint">🔍 تكبير الصورة</div>
+          </div>
+          <div class="fee-details">
+            <div class="fee-title">${img.title}</div>
+            <div class="fee-desc">${img.desc}</div>
+          </div>
+        </div>
+      `).join('');
+      return;
+    }
+    
+    grid.innerHTML = images.map((img, idx) => `
+      <div class="fee-card" onclick="openLightbox('${img.url}')">
+        <div class="fee-img-wrap">
+          <img src="${img.url}" alt="جدول رسوم ${idx + 1}">
+          <div class="fee-zoom-hint">🔍 تكبير الصورة</div>
+        </div>
+        <div class="fee-details">
+          <div class="fee-title">جدول الرسوم المعتمد #${idx + 1}</div>
+          <div class="fee-desc">اضغط لعرض جدول الرسوم والتفاصيل بشكل مكبر</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  async function loadFees() {
+    try {
+      const res = await fetch(`${API_BASE}/fees`);
+      const data = await res.json();
+      if (data.success) {
+        renderFees(data.data);
+      } else {
+        throw new Error('API failed');
+      }
+    } catch (err) {
+      renderFees([]);
+    }
+  }
+  
+  function openLightbox(url) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  
+  // Load initially
+  loadFees();
+</script>
+</body>
+</html>

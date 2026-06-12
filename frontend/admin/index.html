@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم — مدرسة رواد التعليمية</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary:      #683c60;
+      --primary-mid:  #8b5c82;
+      --primary-light:#b57ea5;
+      --secondary:    #f7c8d9;
+      --gold:         #cca54d;
+      --teal:         #579288;
+      --danger:       #c0392b;
+      --success:      #27ae60;
+      --bg:           #f6f8fb;
+      --bg-card:      #ffffff;
+      --text-main:    #2a2027;
+      --text-muted:   #7a6d75;
+      --border:       #f2e9ee;
+      --radius:       12px;
+      --shadow-sm:    0 2px 10px rgba(104,60,96,0.03);
+      --shadow:       0 8px 30px rgba(104,60,96,0.06);
+      --font:         'Cairo', sans-serif;
+      --font-d:       'Tajawal', sans-serif;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text-main); overflow-x: hidden; min-height: 100vh; }
+    
+    /* ── Login Screen ──────────────────────────────────────────── */
+    .login-container {
+      position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary) 0%, #462640 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+    }
+    .login-box {
+      background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center;
+      animation: zoomIn 0.3s ease;
+    }
+    @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .login-logo {
+      width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1.8rem; font-weight: 800; font-family: var(--font-d); margin-bottom: 20px;
+    }
+    .login-title { font-family: var(--font-d); font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .login-sub { font-size: .84rem; color: var(--text-muted); margin-bottom: 28px; }
+    .form-group { text-align: right; margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: .84rem; font-weight: 700; color: var(--text-main); }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 11px 14px; border: 2px solid var(--border); border-radius: var(--radius);
+      outline: none; font-family: var(--font); font-size: .9rem; transition: .2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 50px;
+      font-family: var(--font); font-size: .95rem; font-weight: 700; cursor: pointer; border: none; transition: .25s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(104,60,96,0.2); }
+    .btn-primary:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #a82e22; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #1f8b4c; }
+    .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--border); }
+    .btn-outline:hover { border-color: var(--primary); background: #fdfafb; }
+    
+    /* ── Main Layout ───────────────────────────────────────────── */
+    .dashboard-layout { display: flex; min-height: 100vh; }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 260px; background: #2b1727; color: #fff; flex-shrink: 0;
+      display: flex; flex-direction: column; z-index: 100; transition: .3s;
+    }
+    .sidebar-header { padding: 30px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .sidebar-logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--gold), #b8913b); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; }
+    .sidebar-title { font-family: var(--font-d); font-size: .98rem; font-weight: 800; line-height: 1.2; }
+    .sidebar-sub { font-size: .7rem; color: rgba(255,255,255,0.5); }
+    
+    .sidebar-menu { list-style: none; padding: 24px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .menu-item a {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px;
+      font-size: .9rem; font-weight: 600; color: rgba(255,255,255,0.7); transition: .2s;
+    }
+    .menu-item.active a, .menu-item a:hover {
+      background: rgba(255,255,255,0.08); color: #fff;
+    }
+    .menu-item.active a::before {
+      content: ''; display: block; width: 4px; height: 16px; background: var(--gold); border-radius: 10px; position: absolute; right: 8px;
+    }
+    .menu-item { position: relative; }
+    .sidebar-footer { margin-top: auto; padding: 24px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .sidebar-user { font-size: .84rem; font-weight: 700; color: var(--gold); margin-bottom: 12px; }
+    
+    /* Main Content */
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+    .top-bar {
+      background: #fff; padding: 18px 30px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-title { font-family: var(--font-d); font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+    
+    .content-body { padding: 30px; flex-grow: 1; overflow-y: auto; }
+    
+    /* ── Dashboard Cards & UI elements ─────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card {
+      background: #fff; border-radius: var(--radius); padding: 24px; border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between;
+    }
+    .stat-info { display: flex; flex-direction: column; gap: 4px; }
+    .stat-label { font-size: .84rem; color: var(--text-muted); font-weight: 600; }
+    .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--primary); font-family: var(--font-d); }
+    .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .stat-icon.p { background: rgba(104,60,96,0.1); color: var(--primary); }
+    .stat-icon.g { background: rgba(204,165,77,0.1); color: var(--gold); }
+    .stat-icon.s { background: rgba(39,174,96,0.1); color: var(--success); }
+    .stat-icon.d { background: rgba(192,57,43,0.1); color: var(--danger); }
+    
+    /* Tables & Panels */
+    .panel { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 30px; }
+    .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+    .panel-title { font-family: var(--font-d); font-size: 1rem; font-weight: 800; color: var(--primary); }
+    
+    /* Table styling */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: right; }
+    th { padding: 16px 24px; background: #faf8fa; border-bottom: 2px solid var(--border); font-size: .8rem; font-weight: 700; color: var(--text-muted); }
+    td { padding: 16px 24px; border-bottom: 1px solid var(--border); font-size: .88rem; color: var(--text-main); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    
+    /* Badges */
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 50px; font-size: .75rem; font-weight: 700; }
+    .status-pending { background: #fff4e0; color: #b8860b; }
+    .status-under_review { background: #e8f4fd; color: var(--primary-light); }
+    .status-accepted { background: #ebf9f1; color: var(--success); }
+    .status-rejected { background: #fdf2f0; color: var(--danger); }
+    .status-waitlist { background: #f5f2f5; color: var(--primary-mid); }
+    
+    /* Views Manager */
+    .view-pane { display: none; }
+    .view-pane.active { display: block; }
+    
+    /* Forms, filters and searches */
+    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .search-input { padding: 8px 14px; border: 1px solid var(--border); border-radius: 50px; font-size: .84rem; outline: none; width: 220px; }
+    .search-input:focus { border-color: var(--primary-light); }
+    .select-input { padding: 8px 14px; border: 1px solid var(--border); border-radius: 50px; font-size: .84rem; outline: none; background: #fff; cursor: pointer; }
+    
+    /* Upload Gallery */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 24px; }
+    .gallery-item { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; aspect-ratio: 4/3; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: .2s; }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    
+    /* ── Detail Modal ─────────────────────────────────────────── */
+    .detail-modal {
+      position: fixed; inset: 0; background: rgba(42,32,39,0.5); backdrop-filter: blur(2px);
+      z-index: 1500; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .detail-modal.open { display: flex; }
+    .modal-card {
+      background: #fff; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: var(--shadow-lg);
+      display: flex; flex-direction: column; max-height: 90vh; overflow: hidden;
+      animation: modalSlideUp .3s ease;
+    }
+    @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-head { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-family: var(--font-d); font-weight: 800; color: var(--primary); font-size: 1.1rem; }
+    .modal-close { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 24px; overflow-y: auto; }
+    .modal-foot { padding: 18px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; background: #faf8fa; }
+    
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .detail-item { background: #fbf9fb; padding: 12px; border-radius: 8px; }
+    .detail-lbl { font-size: .75rem; color: var(--text-muted); margin-bottom: 2px; }
+    .detail-val { font-weight: 700; font-size: .88rem; }
+    .detail-full { grid-column: 1 / -1; }
+    
+    /* Loading spinner */
+    .spinner { border: 3px solid rgba(104,60,96,0.1); width: 32px; height: 32px; border-radius: 50%; border-left-color: var(--primary); animation: spin 0.8s linear infinite; margin: 30px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── Login Panel ── -->
+<div class="login-container" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">ر</div>
+    <h2 class="login-title">بوابة الإشراف والإدارة</h2>
+    <p class="login-sub">مدرسة رواد التعليمية الأهلية للبنات</p>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="login-email">البريد الإلكتروني</label>
+        <input type="email" id="login-email" required placeholder="admin@rowadschool.edu.sa">
+      </div>
+      <div class="form-group">
+        <label for="login-password">كلمة المرور</label>
+        <input type="password" id="login-password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 14px;">تسجيل الدخول</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Dashboard Main Layout ── -->
+<div class="dashboard-layout" id="dashboardLayout" style="display: none;">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">ر</div>
+      <div>
+        <div class="sidebar-title">لوحة الإدارة</div>
+        <div class="sidebar-sub">مدرسة رواد للبنات</div>
+      </div>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="menu-item active" id="menu-stats" onclick="switchView('stats')">
+        <a href="#"><span>📊</span> الإحصائيات العامة</a>
+      </li>
+      <li class="menu-item" id="menu-students" onclick="switchView('students')">
+        <a href="#"><span>👩‍🎓</span> طلبات الطالبات</a>
+      </li>
+      <li class="menu-item" id="menu-announcements" onclick="switchView('announcements')">
+        <a href="#"><span>📢</span> إدارة الإعلانات</a>
+      </li>
+      <li class="menu-item" id="menu-fees" onclick="switchView('fees')">
+        <a href="#"><span>💰</span> جداول الرسوم</a>
+      </li>
+      <li class="menu-item" id="menu-reviews" onclick="switchView('reviews')">
+        <a href="#"><span>⭐</span> مراجعة التقييمات</a>
+      </li>
+      <li class="menu-item" id="menu-settings" onclick="switchView('settings')">
+        <a href="#"><span>⚙️</span> إعدادات الموقع</a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="adminUserName">مدير النظام</div>
+      <button class="btn btn-danger" style="width: 100%; padding: 8px 16px; font-size: .8rem;" onclick="handleLogout()">🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+  
+  <!-- Main -->
+  <main class="main-content">
+    <div class="top-bar">
+      <h2 class="top-title" id="viewTitle">الإحصائيات العامة</h2>
+      <div>
+        <button class="btn btn-outline" style="padding: 6px 14px; font-size: .8rem;" onclick="triggerSync()">🔄 مزامنة السوشيال ميديا</button>
+      </div>
+    </div>
+    
+    <div class="content-body">
+      
+      <!-- ── VIEW: Stats ────────────────────────────────────────── -->
+      <div class="view-pane active" id="view-stats">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">إجمالي الطلبات</span>
+              <span class="stat-val" id="stat-total">0</span>
+            </div>
+            <div class="stat-icon p">👩‍🎓</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">طلبات معلقة</span>
+              <span class="stat-val" id="stat-pending">0</span>
+            </div>
+            <div class="stat-icon g">⏳</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">طالبات مقبولات</span>
+              <span class="stat-val" id="stat-accepted">0</span>
+            </div>
+            <div class="stat-icon s">✅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">إعلانات نشطة</span>
+              <span class="stat-val" id="stat-announcements">0</span>
+            </div>
+            <div class="stat-icon d">📢</div>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">طلبات التسجيل الأخيرة</h3>
+            <button class="btn btn-outline" style="padding:6px 14px; font-size:.8rem;" onclick="switchView('students')">عرض الكل</button>
+          </div>
+          <div class="table-wrap">
+            <table id="recentStudentsTable">
+              <thead>
+                <tr>
+                  <th>رقم الطلب</th>
+                  <th>اسم الطالبة</th>
+                  <th>الصف المطلوب</th>
+                  <th>اسم ولي الأمر</th>
+                  <th>الحالة</th>
+                  <th>تاريخ التقديم</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Students ─────────────────────────────────────── -->
+      <div class="view-pane" id="view-students">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">قائمة طلبات التسجيل</h3>
+            <div class="filter-bar">
+              <input type="text" placeholder="بحث باسم الطالبة أو ولي الأمر..." class="search-input" id="studentSearch" oninput="filterStudents()">
+              <select class="select-input" id="studentStatusFilter" onchange="filterStudents()">
+                <option value="">كل الحالات</option>
+                <option value="pending">قيد الانتظار</option>
+                <option value="under_review">تحت المراجعة</option>
+                <option value="accepted">مقبول</option>
+                <option value="rejected">مرفوض</option>
+                <option value="waitlist">قائمة الانتظار</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="studentsTable">
+              <thead>
+                <tr>
+                  <th>رقم الطلب</th>
+                  <th>اسم الطالبة</th>
+                  <th>الصف المطلوب</th>
+                  <th>اسم ولي الأمر</th>
+                  <th>الجوال</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="studentsTableBody">
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Announcements ────────────────────────────────── -->
+      <div class="view-pane" id="view-announcements">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">إدارة الإعلانات والعروض</h3>
+            <button class="btn btn-primary" onclick="openAnnModal()" style="padding: 8px 18px; font-size: .84rem;">➕ إضافة إعلان جديد</button>
+          </div>
+          <div class="table-wrap">
+            <table id="annTable">
+              <thead>
+                <tr>
+                  <th>العنوان</th>
+                  <th>النوع</th>
+                  <th>تثبيت</th>
+                  <th>الحالة</th>
+                  <th>تاريخ الإنشاء</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="annTableBody">
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Fees ─────────────────────────────────────────── -->
+      <div class="view-pane" id="view-fees">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">رفع جداول الرسوم الدراسية</h3>
+            <form id="feeUploadForm" onsubmit="uploadFeeImage(event)" style="display: flex; gap: 10px; align-items: center;">
+              <input type="file" id="feeImageFile" required accept="image/*" class="select-input">
+              <button type="submit" class="btn btn-primary" style="padding: 8px 18px; font-size: .84rem;">📤 رفع الصورة</button>
+            </form>
+          </div>
+          <div class="gallery-grid" id="feesGallery">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Reviews ──────────────────────────────────────── -->
+      <div class="view-pane" id="view-reviews">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">مراجعة تقييمات أولياء الأمور</h3>
+          </div>
+          <div class="table-wrap">
+            <table id="reviewsTable">
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>الصفة</th>
+                  <th>التقييم</th>
+                  <th>التعليق</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="reviewsTableBody">
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Settings ─────────────────────────────────────── -->
+      <div class="view-pane" id="view-settings">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+          
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="panel-title">إعدادات الاتصال والروابط</h3>
+            </div>
+            <div style="padding: 24px;">
+              <form id="settingsForm" onsubmit="saveSettings(event)">
+                <div class="form-group">
+                  <label for="set-name">اسم المدرسة</label>
+                  <input type="text" id="set-name" placeholder="مدرسة رواد التعليمية للبنات">
+                </div>
+                <div class="form-group">
+                  <label for="set-phone">رقم الجوال / الاتصال</label>
+                  <input type="text" id="set-phone" placeholder="966500000000">
+                </div>
+                <div class="form-group">
+                  <label for="set-email">البريد الإلكتروني للمدرسة</label>
+                  <input type="email" id="set-email" placeholder="info@rowadschool.edu.sa">
+                </div>
+                <div class="form-group">
+                  <label for="set-ig-token">رمز اتصال إنستقرام (Instagram Access Token)</label>
+                  <textarea id="set-ig-token" rows="2" placeholder="أدخلي توكن إنستقرام لتمكين جلب المنشورات تلقائياً..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">💾 حفظ الإعدادات</button>
+              </form>
+            </div>
+          </div>
+          
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="panel-title">إضافة منشور تواصل يدوي</h3>
+            </div>
+            <div style="padding: 24px;">
+              <form id="socialPostForm" onsubmit="createSocialPost(event)">
+                <div class="form-group">
+                  <label for="soc-url">رابط المنشور على السوشيال ميديا <span style="color:red;">*</span></label>
+                  <input type="url" id="soc-url" required placeholder="https://instagram.com/p/...">
+                </div>
+                <div class="form-group">
+                  <label for="soc-media">رابط صورة المنشور (رابط مباشر لسهولة العرض)</label>
+                  <input type="url" id="soc-media" placeholder="https://images.unsplash.com/photo-...">
+                </div>
+                <div class="form-group">
+                  <label for="soc-caption">نص المنشور</label>
+                  <textarea id="soc-caption" rows="2" placeholder="اكتبي نص المنشور أو الهاشتاقات..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="soc-platform">المنصة</label>
+                  <select id="soc-platform">
+                    <option value="instagram">Instagram</option>
+                    <option value="twitter">X (Twitter)</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">📤 نشر وإضافة للموقع</button>
+              </form>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </main>
+</div>
+
+<!-- ── Student Detail Modal ── -->
+<div class="detail-modal" id="studentModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 class="modal-title">تفاصيل طلب التسجيل</h3>
+      <button class="modal-close" onclick="closeStudentModal()">✕</button>
+    </div>
+    <div class="modal-body" id="studentModalBody">
+      <!-- Loaded dynamically -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeStudentModal()">إغلاق</button>
+      <button class="btn btn-danger" id="btn-modal-reject" onclick="changeStudentStatus('rejected')">❌ رفض الطلب</button>
+      <button class="btn btn-primary" id="btn-modal-review" onclick="changeStudentStatus('under_review')">⏳ وضع تحت المراجعة</button>
+      <button class="btn btn-success" id="btn-modal-accept" onclick="changeStudentStatus('accepted')">✅ قبول الطالبة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Announcement Form Modal ── -->
+<div class="detail-modal" id="annModal">
+  <div class="modal-card" style="max-width: 500px;">
+    <div class="modal-head">
+      <h3 class="modal-title" id="annModalTitle">إضافة إعلان جديد</h3>
+      <button class="modal-close" onclick="closeAnnModal()">✕</button>
+    </div>
+    <form id="annForm" onsubmit="saveAnnouncement(event)">
+      <input type="hidden" id="ann-id">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="ann-title">عنوان الإعلان <span style="color:red;">*</span></label>
+          <input type="text" id="ann-title" required placeholder="مثال: خصم التسجيل المبكر">
+        </div>
+        <div class="form-group">
+          <label for="ann-type">نوع المنشور</label>
+          <select id="ann-type">
+            <option value="announcement">إعلان عام</option>
+            <option value="offer">عرض خاص</option>
+            <option value="news">أخبار</option>
+            <option value="event">فعالية</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ann-content">محتوى الإعلان <span style="color:red;">*</span></label>
+          <textarea id="ann-content" required rows="4" placeholder="تفاصيل الإعلان..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="ann-image">صورة الإعلان (تجاوز لو كانت مرفوعة سابقاً)</label>
+          <input type="file" id="ann-image" accept="image/*">
+        </div>
+        <div class="form-group" style="flex-direction: row; gap: 20px; align-items: center; margin-top: 10px;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="ann-pinned"> تثبيت في الأعلى 📌
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="ann-active" checked> تفعيل النشاط
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeAnnModal()">إلغاء</button>
+        <button type="submit" class="btn btn-primary">حفظ الإعلان</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── State Management ─────────────────────────────────────────────
+let token = localStorage.getItem('admin_token') || null;
+let allStudents = [];
+let selectedStudentId = null;
+
+// ── Auth Handling ────────────────────────────────────────────────
+function checkAuth() {
+  if (token) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboardLayout').style.display = 'flex';
+    // Fetch stats
+    fetchStats();
+    fetchStudents();
+    fetchAnnouncements();
+    fetchFees();
+    fetchReviews();
+    loadSettings();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboardLayout').style.display = 'none';
+  }
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      token = data.accessToken;
+      localStorage.setItem('admin_token', token);
+      document.getElementById('adminUserName').textContent = data.user.name;
+      checkAuth();
+    } else {
+      alert('فشل تسجيل الدخول: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الخادم أثناء تسجيل الدخول.');
+  }
+}
+
+function handleLogout() {
+  token = null;
+  localStorage.removeItem('admin_token');
+  checkAuth();
+}
+
+// Helper fetch headers
+function getHeaders() {
+  return {
+    'Authorization': `Bearer ${token}`
+  };
+}
+
+// ── View Switching ───────────────────────────────────────────────
+const viewTitles = {
+  stats: 'الإحصائيات العامة',
+  students: 'إدارة طلبات الطالبات',
+  announcements: 'إدارة الإعلانات والعروض',
+  fees: 'إدارة جداول الرسوم',
+  reviews: 'مراجعة التقييمات وآراء أولياء الأمور',
+  settings: 'إعدادات الموقع والسوشيال ميديا'
+};
+
+function switchView(viewName) {
+  document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+  
+  document.getElementById(`view-${viewName}`).classList.add('active');
+  document.getElementById(`menu-${viewName}`).classList.add('active');
+  document.getElementById('viewTitle').textContent = viewTitles[viewName];
+  
+  // Refresh view data
+  if (viewName === 'stats') fetchStats();
+  if (viewName === 'students') fetchStudents();
+  if (viewName === 'announcements') fetchAnnouncements();
+  if (viewName === 'fees') fetchFees();
+  if (viewName === 'reviews') fetchReviews();
+}
+
+// ── Statistics & Dashboard ───────────────────────────────────────
+async function fetchStats() {
+  try {
+    const res = await fetch('/api/students', { headers: getHeaders() });
+    const data = await res.json();
+    
+    if (data.success) {
+      const students = data.data;
+      document.getElementById('stat-total').textContent = students.length;
+      document.getElementById('stat-pending').textContent = students.filter(s => s.status === 'pending').length;
+      document.getElementById('stat-accepted').textContent = students.filter(s => s.status === 'accepted').length;
+      
+      // Load recent students table
+      const tbody = document.querySelector('#recentStudentsTable tbody');
+      const recent = students.slice(0, 5);
+      
+      const statusTranslations = {
+        pending: 'قيد الانتظار',
+        under_review: 'تحت المراجعة',
+        accepted: 'مقبول',
+        rejected: 'مرفوض',
+        waitlist: 'قائمة الانتظار'
+      };
+      
+      tbody.innerHTML = recent.map(s => `
+        <tr>
+          <td><strong>${s.registrationNumber}</strong></td>
+          <td>${s.studentName}</td>
+          <td>${s.grade}</td>
+          <td>${s.guardianName}</td>
+          <td><span class="status-badge status-${s.status}">${statusTranslations[s.status]}</span></td>
+          <td>${new Date(s.createdAt).toLocaleDateString('ar-SA')}</td>
+        </tr>
+      `).join('');
+    }
+    
+    const resAnn = await fetch('/api/announcements');
+    const dataAnn = await resAnn.json();
+    if (dataAnn.success) {
+      document.getElementById('stat-announcements').textContent = dataAnn.data.length;
+    }
+  } catch (err) {
+    console.error('Stats loading failed', err);
+  }
+}
+
+// ── Students Management ──────────────────────────────────────────
+async function fetchStudents() {
+  try {
+    const res = await fetch('/api/students', { headers: getHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      allStudents = data.data;
+      renderStudentsList(allStudents);
+    }
+  } catch (err) {
+    console.error('Students loading failed', err);
+  }
+}
+
+function renderStudentsList(list) {
+  const tbody = document.getElementById('studentsTableBody');
+  const statusTranslations = {
+    pending: 'قيد الانتظار',
+    under_review: 'تحت المراجعة',
+    accepted: 'مقبول',
+    rejected: 'مرفوض',
+    waitlist: 'قائمة الانتظار'
+  };
+  
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">لا توجد طلبات تسجيل مطابقة.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = list.map(s => `
+    <tr>
+      <td><strong>${s.registrationNumber}</strong></td>
+      <td>${s.studentName}</td>
+      <td>${s.grade}</td>
+      <td>${s.guardianName} (${s.guardianRelation})</td>
+      <td dir="ltr" style="text-align:right;">${s.guardianPhone}</td>
+      <td><span class="status-badge status-${s.status}">${statusTranslations[s.status]}</span></td>
+      <td>
+        <button class="btn btn-outline" style="padding:6px 12px; font-size:.8rem;" onclick="openStudentModal('${s._id}')">👁️ عرض وتعديل</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterStudents() {
+  const query = document.getElementById('studentSearch').value.toLowerCase();
+  const filterVal = document.getElementById('studentStatusFilter').value;
+  
+  let list = allStudents;
+  if (filterVal) {
+    list = list.filter(s => s.status === filterVal);
+  }
+  if (query) {
+    list = list.filter(s => s.studentName.toLowerCase().includes(query) || s.guardianName.toLowerCase().includes(query) || s.registrationNumber.toLowerCase().includes(query));
+  }
+  
+  renderStudentsList(list);
+}
+
+function openStudentModal(id) {
+  selectedStudentId = id;
+  const s = allStudents.find(student => student._id === id);
+  if (!s) return;
+  
+  const statusTranslations = {
+    pending: 'قيد الانتظار',
+    under_review: 'تحت المراجعة',
+    accepted: 'مقبول',
+    rejected: 'مرفوض',
+    waitlist: 'قائمة الانتظار'
+  };
+  
+  const html = `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-lbl">رقم التسجيل</div><div class="detail-val" style="color:var(--primary); font-size:1.1rem;">${s.registrationNumber}</div></div>
+      <div class="detail-item"><div class="detail-lbl">حالة الطلب</div><div class="detail-val"><span class="status-badge status-${s.status}">${statusTranslations[s.status]}</span></div></div>
+      <div class="detail-item"><div class="detail-lbl">اسم الطالبة</div><div class="detail-val">${s.studentName}</div></div>
+      <div class="detail-item"><div class="detail-lbl">تاريخ الميلاد</div><div class="detail-val">${new Date(s.dateOfBirth).toLocaleDateString('ar-SA')}</div></div>
+      <div class="detail-item"><div class="detail-lbl">الجنسية</div><div class="detail-val">${s.nationality}</div></div>
+      <div class="detail-item"><div class="detail-lbl">الصف الدراسي المطلوب</div><div class="detail-val">${s.grade}</div></div>
+      <div class="detail-item full"><div class="detail-lbl">المدرسة السابقة</div><div class="detail-val">${s.previousSchool || 'لم تُذكر'}</div></div>
+      
+      <div class="detail-item"><div class="detail-lbl">اسم ولي الأمر</div><div class="detail-val">${s.guardianName}</div></div>
+      <div class="detail-item"><div class="detail-lbl">صلة القرابة</div><div class="detail-val">${s.guardianRelation}</div></div>
+      <div class="detail-item"><div class="detail-lbl">رقم الجوال</div><div class="detail-val" dir="ltr" style="text-align:right;">${s.guardianPhone}</div></div>
+      <div class="detail-item"><div class="detail-lbl">البريد الإلكتروني</div><div class="detail-val" dir="ltr" style="text-align:right;">${s.guardianEmail}</div></div>
+      
+      <div class="detail-item full">
+        <div class="detail-lbl">ملاحظات الإدارة والقبول</div>
+        <textarea id="modalAdminNotes" rows="3" style="width:100%; border:1px solid var(--border); border-radius:8px; padding:10px; font-family:var(--font); font-size:.84rem; margin-top:6px;" placeholder="اكتب ملاحظات القبول أو شروط الالتحاق...">${s.adminNotes || ''}</textarea>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('studentModalBody').innerHTML = html;
+  document.getElementById('studentModal').classList.add('open');
+}
+
+function closeStudentModal() {
+  document.getElementById('studentModal').classList.remove('open');
+}
+
+async function changeStudentStatus(newStatus) {
+  const notes = document.getElementById('modalAdminNotes').value;
+  try {
+    const res = await fetch(`/api/students/${selectedStudentId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getHeaders()
+      },
+      body: JSON.stringify({ status: newStatus, notes })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تم تحديث حالة الطلب والملاحظات بنجاح.');
+      closeStudentModal();
+      fetchStudents();
+    } else {
+      alert('فشل التحديث: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الخادم أثناء التحديث.');
+  }
+}
+
+// ── Announcements Management ────────────────────────────────────
+async function fetchAnnouncements() {
+  try {
+    const res = await fetch('/api/announcements/admin', { headers: getHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      renderAnnouncementsTable(data.data);
+    }
+  } catch (err) {
+    console.error('Announcements loading failed', err);
+  }
+}
+
+function renderAnnouncementsTable(list) {
+  const tbody = document.getElementById('annTableBody');
+  const typeLabels = {
+    announcement: 'إعلان عام',
+    offer: 'عرض خاص',
+    news: 'أخبار',
+    event: 'فعالية'
+  };
+  
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;">لا توجد إعلانات حالياً.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = list.map(ann => `
+    <tr>
+      <td><strong>${ann.title}</strong></td>
+      <td>${typeLabels[ann.type] || ann.type}</td>
+      <td>${ann.isPinned ? '📌 مثبت' : 'لا'}</td>
+      <td>${ann.isActive ? '🟢 نشط' : '🔴 معطل'}</td>
+      <td>${new Date(ann.createdAt).toLocaleDateString('ar-SA')}</td>
+      <td>
+        <button class="btn btn-outline" style="padding:6px 12px; font-size:.8rem; margin-left:4px;" onclick="openAnnModal('${ann._id}')">✏️ تعديل</button>
+        <button class="btn btn-danger" style="padding:6px 12px; font-size:.8rem;" onclick="deleteAnnouncement('${ann._id}')">🗑️ حذف</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAnnModal(id = null) {
+  document.getElementById('annForm').reset();
+  document.getElementById('ann-id').value = '';
+  document.getElementById('annModalTitle').textContent = 'إضافة إعلان جديد';
+  
+  if (id) {
+    document.getElementById('annModalTitle').textContent = 'تعديل الإعلان';
+    // Fetch individual or find in current loaded data
+    fetch(`/api/announcements/admin`, { headers: getHeaders() })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const ann = data.data.find(a => a._id === id);
+          if (ann) {
+            document.getElementById('ann-id').value = ann._id;
+            document.getElementById('ann-title').value = ann.title;
+            document.getElementById('ann-type').value = ann.type;
+            document.getElementById('ann-content').value = ann.content;
+            document.getElementById('ann-pinned').checked = ann.isPinned;
+            document.getElementById('ann-active').checked = ann.isActive;
+          }
+        }
+      });
+  }
+  document.getElementById('annModal').classList.add('open');
+}
+
+function closeAnnModal() {
+  document.getElementById('annModal').classList.remove('open');
+}
+
+async function saveAnnouncement(e) {
+  e.preventDefault();
+  const id = document.getElementById('ann-id').value;
+  const title = document.getElementById('ann-title').value;
+  const type = document.getElementById('ann-type').value;
+  const content = document.getElementById('ann-content').value;
+  const isPinned = document.getElementById('ann-pinned').checked;
+  const isActive = document.getElementById('ann-active').checked;
+  const imgFile = document.getElementById('ann-image').files[0];
+  
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('type', type);
+  formData.append('content', content);
+  formData.append('isPinned', isPinned);
+  formData.append('isActive', isActive);
+  if (imgFile) {
+    formData.append('image', imgFile);
+  }
+  
+  const url = id ? `/api/announcements/${id}` : '/api/announcements';
+  const method = id ? 'PUT' : 'POST';
+  
+  try {
+    const res = await fetch(url, {
+      method: method,
+      headers: {
+        ...getHeaders()
+      },
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message);
+      closeAnnModal();
+      fetchAnnouncements();
+    } else {
+      alert('حدث خطأ: ' + data.message);
+    }
+  } catch (err) {
+    alert('خطأ في الاتصال بالخادم.');
+  }
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
+  try {
+    const res = await fetch(`/api/announcements/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تم حذف الإعلان بنجاح.');
+      fetchAnnouncements();
+    } else {
+      alert('فشل الحذف: ' + data.message);
+    }
+  } catch (err) {
+    alert('خطأ في الاتصال بالخادم.');
+  }
+}
+
+// ── Fees Structure Gallery ──────────────────────────────────────
+async function fetchFees() {
+  try {
+    const res = await fetch('/api/fees');
+    const data = await res.json();
+    if (data.success) {
+      renderFeesGallery(data.data);
+    }
+  } catch (err) {
+    console.error('Fees loading failed', err);
+  }
+}
+
+function renderFeesGallery(list) {
+  const gallery = document.getElementById('feesGallery');
+  if (!list.length) {
+    gallery.innerHTML = '<p style="padding:24px;color:var(--text-muted);grid-column:1/-1;text-align:center;">لا توجد جداول رسوم مرفوعة حالياً.</p>';
+    return;
+  }
+  
+  gallery.innerHTML = list.map(img => `
+    <div class="gallery-item">
+      <img src="${img.url}" alt="جدول الرسوم">
+      <div class="gallery-overlay">
+        <button class="btn btn-danger" style="padding:8px 16px; font-size:.8rem;" onclick="deleteFeeImage('${img.filename}')">🗑️ حذف الجدول</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function uploadFeeImage(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('feeImageFile');
+  if (!fileInput.files.length) return;
+  
+  const formData = new FormData();
+  formData.append('image', fileInput.files[0]);
+  
+  try {
+    const res = await fetch('/api/fees/upload', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تم رفع الجدول بنجاح.');
+      fileInput.value = '';
+      fetchFees();
+    } else {
+      alert('فشل الرفع: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الخادم.');
+  }
+}
+
+async function deleteFeeImage(filename) {
+  if (!confirm('هل أنت متأكد من حذف صورة الرسوم هذه؟')) return;
+  try {
+    const res = await fetch(`/api/fees/${filename}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تم حذف صورة الرسوم بنجاح.');
+      fetchFees();
+    } else {
+      alert('فشل الحذف: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الاتصال بالخادم.');
+  }
+}
+
+// ── Parent ReviewsModerator ─────────────────────────────────────
+async function fetchReviews() {
+  try {
+    const res = await fetch('/api/reviews/admin', { headers: getHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      renderReviewsTable(data.data);
+    }
+  } catch (err) {
+    console.error('Reviews loading failed', err);
+  }
+}
+
+function renderReviewsTable(list) {
+  const tbody = document.getElementById('reviewsTableBody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;">لا توجد تقييمات للزوار حالياً.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = list.map(rev => `
+    <tr>
+      <td><strong>${rev.name}</strong></td>
+      <td>${rev.role}</td>
+      <td style="color:var(--gold); font-size:1.1rem;">${'★'.repeat(rev.rating)}</td>
+      <td>${rev.comment}</td>
+      <td>${rev.isApproved ? '🟢 معتمد ومقروء' : '⏳ قيد المراجعة'}</td>
+      <td>
+        ${!rev.isApproved ? `<button class="btn btn-success" style="padding:6px 12px; font-size:.8rem; margin-left:4px;" onclick="approveReview('${rev._id}')">✅ موافقة</button>` : ''}
+        <button class="btn btn-danger" style="padding:6px 12px; font-size:.8rem;" onclick="deleteReview('${rev._id}')">🗑️ حذف</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function approveReview(id) {
+  try {
+    const res = await fetch(`/api/reviews/${id}/approve`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تمت الموافقة على التقييم وسيظهر في الصفحة الرئيسية.');
+      fetchReviews();
+    } else {
+      alert('فشل الإجراء: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الخادم.');
+  }
+}
+
+async function deleteReview(id) {
+  if (!confirm('هل تريد حذف هذا التقييم نهائياً؟')) return;
+  try {
+    const res = await fetch(`/api/reviews/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تم حذف التقييم بنجاح.');
+      fetchReviews();
+    } else {
+      alert('فشل الحذف: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الخادم.');
+  }
+}
+
+// ── Settings & Social Feed Insert ──────────────────────────────
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings/public');
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('set-name').value = data.data.school_name || '';
+      document.getElementById('set-phone').value = data.data.school_phone || '';
+      document.getElementById('set-email').value = data.data.school_email || '';
+    }
+    // Try to get token setting if stored
+    const resSec = await fetch('/api/settings/instagram_token', { headers: getHeaders() });
+    const dataSec = await resSec.json();
+    if (dataSec.success && dataSec.data) {
+      document.getElementById('set-ig-token').value = dataSec.data.value || '';
+    }
+  } catch (err) {
+    console.error('Settings loading failed', err);
+  }
+}
+
+async function saveSettings(e) {
+  e.preventDefault();
+  const name = document.getElementById('set-name').value;
+  const phone = document.getElementById('set-phone').value;
+  const email = document.getElementById('set-email').value;
+  const igToken = document.getElementById('set-ig-token').value;
+  
+  try {
+    await fetch('/api/settings/school_name', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders() },
+      body: JSON.stringify({ value: name })
+    });
+    await fetch('/api/settings/school_phone', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders() },
+      body: JSON.stringify({ value: phone })
+    });
+    await fetch('/api/settings/school_email', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders() },
+      body: JSON.stringify({ value: email })
+    });
+    await fetch('/api/settings/instagram_token', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders() },
+      body: JSON.stringify({ value: igToken })
+    });
+    
+    alert('تم حفظ كافة الإعدادات بنجاح.');
+    loadSettings();
+  } catch (err) {
+    alert('حدث خطأ أثناء حفظ الإعدادات.');
+  }
+}
+
+async function createSocialPost(e) {
+  e.preventDefault();
+  const url = document.getElementById('soc-url').value;
+  const mediaUrl = document.getElementById('soc-media').value;
+  const caption = document.getElementById('soc-caption').value;
+  const platform = document.getElementById('soc-platform').value;
+  
+  try {
+    const res = await fetch('/api/social', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getHeaders()
+      },
+      body: JSON.stringify({ url, mediaUrl, caption, platform })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('تمت إضافة المنشور للسوشيال ميديا المعروضة بالموقع بنجاح.');
+      document.getElementById('socialPostForm').reset();
+    } else {
+      alert('فشل الإضافة: ' + data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في الاتصال بالخادم.');
+  }
+}
+
+async function triggerSync() {
+  try {
+    const res = await fetch('/api/social/sync', {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    alert(data.message);
+  } catch (err) {
+    alert('حدث خطأ في المزامنة.');
+  }
+}
+
+// Initialize Auth check
+checkAuth();
+</script>
+</body>
+</html>
