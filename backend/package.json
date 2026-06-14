@@ -1,14 +1,15 @@
 {
-  "name": "backend",
+  "name": "school-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "مدرسة رواد التعليمية — Backend API",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js",
+    "test": "echo \"No tests yet\" && exit 0"
   },
-  "keywords": [],
+  "keywords": ["school", "education", "api"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -21,7 +22,11 @@
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.0",
+    "morgan": "^1.10.0",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.11"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

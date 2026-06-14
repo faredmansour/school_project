@@ -1,17 +1,18 @@
 /**
- * Seed script — creates the first super_admin user
- * Usage: node scripts/seed.js
+ * Seed script — ينشئ أول مستخدم super_admin في قاعدة البيانات.
+ * الاستخدام: node scripts/seed.js
  */
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 const mongoose = require('mongoose');
-const User = require('../models/User');
+const User = require('../src/models/User');
+const { ROLES } = require('../src/config/constants');
 
 const seed = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/school_db');
     console.log('✅ Connected to MongoDB');
 
-    const existing = await User.findOne({ role: 'super_admin' });
+    const existing = await User.findOne({ role: ROLES.SUPER_ADMIN });
     if (existing) {
       console.log('⚠️  Super admin already exists:', existing.email);
       process.exit(0);
@@ -20,8 +21,8 @@ const seed = async () => {
     await User.create({
       name: 'مدير النظام',
       email: 'admin@rowadschool.edu.sa',
-      password: 'Admin@2025#', // Change immediately after first login
-      role: 'super_admin',
+      password: 'Admin@2025#', // غيّر كلمة المرور فور تسجيل الدخول
+      role: ROLES.SUPER_ADMIN,
     });
 
     console.log('✅ Super admin created!');

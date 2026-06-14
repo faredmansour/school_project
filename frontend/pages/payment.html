@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة الدفع — مدرسة رواد التعليمية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #683c60; --primary-light: #b57ea5; --gold: #cca54d;
+      --success: #27ae60; --error: #e74c3c;
+      --bg: #fefbfc; --card: #ffffff; --border: #e8e0e5;
+      --text: #2a2027; --muted: #7a6d75;
+      --radius: 12px; --shadow: 0 4px 24px rgba(104,60,96,.06);
+      --font: 'Cairo', sans-serif; --font-d: 'Tajawal', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: var(--primary); }
+
+    .page-header { background: linear-gradient(135deg, var(--primary), #462640); padding: 28px 24px; text-align: center; color: #fff; }
+    .header-logo { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
+    .logo-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .header-title { font-family: var(--font-d); font-size: 1.6rem; font-weight: 900; }
+    .header-sub { font-size: .88rem; color: rgba(255,255,255,.7); margin-top: 4px; }
+
+    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+    .checkout-box { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+    
+    .checkout-header { padding: 24px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #faf8f9; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: .88rem; font-weight: 700; color: var(--text); }
+    .field input { padding: 11px 14px; border: 2px solid var(--border); border-radius: var(--radius); font-family: var(--font); font-size: .92rem; outline: none; width: 100%; }
+    .field input:focus { border-color: var(--primary-light); }
+    
+    .methods-nav { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border); padding: 10px 20px 0; gap: 10px; }
+    .method-tab { padding: 12px 20px; font-size: .9rem; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: .2s; }
+    .method-tab:hover { color: var(--primary); }
+    .method-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    
+    .checkout-body { padding: 32px 24px; min-height: 300px; }
+    .method-pane { display: none; animation: fadeIn .3s ease; }
+    .method-pane.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Credit Card Form */
+    .cc-form { max-width: 400px; margin: 0 auto; display: grid; gap: 16px; }
+    .cc-logos { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .cc-logos svg { height: 30px; }
+    
+    /* Tamara Form */
+    .tamara-box { max-width: 400px; margin: 0 auto; border: 1px solid #D4A843; border-radius: 12px; padding: 20px; text-align: center; background: #FFF9E6; }
+    .tamara-title { font-family: var(--font-d); font-weight: 900; color: #D4A843; font-size: 1.2rem; margin-bottom: 12px; }
+    
+    /* Geel Pay */
+    .geel-box { max-width: 400px; margin: 0 auto; border: 1px solid var(--primary-light); border-radius: 12px; padding: 20px; text-align: center; background: #faedf3; }
+    
+    /* Bank Transfer */
+    .bank-box { border: 1px solid var(--border); border-radius: 12px; padding: 20px; background: #fdfaf3; margin-bottom: 20px; }
+    
+    /* Cash */
+    .cash-box { text-align: center; padding: 20px; }
+    .cash-icon { font-size: 3rem; margin-bottom: 10px; }
+
+    .btn-submit { background: var(--success); color: #fff; font-size: 1rem; padding: 14px 36px; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; width: 100%; transition: .2s; margin-top: 24px; }
+    .btn-submit:hover { background: #219a52; transform: translateY(-2px); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
+
+    .msg { padding: 16px; border-radius: 8px; text-align: center; font-weight: 700; display: none; margin-top: 20px; }
+    .msg.success { background: #e8f8f5; color: #117a8b; display: block; }
+    .msg.error { background: #fdeded; color: var(--error); display: block; }
+
+    /* Notice overlay */
+    .demo-notice { background: #fff3cd; color: #856404; padding: 10px; text-align: center; font-size: .85rem; font-weight: bold; border-radius: 8px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-logo">
+    <div class="logo-icon">💳</div>
+    <div class="header-title">بوابة الدفع الموحدة</div>
+  </div>
+  <div class="header-sub">الخطوة الأخيرة لإتمام تسجيل الطالبة بنجاح</div>
+</div>
+
+<div class="container">
+  <div id="statusMsg" class="msg"></div>
+
+  <div class="checkout-box" id="checkoutContainer">
+    <div class="checkout-header">
+      <div class="field">
+        <label>رقم طلب التسجيل (REG-XXX) <span style="color:red">*</span></label>
+        <input type="text" id="commonRegNum" placeholder="REG-2026-..." required>
+      </div>
+      <div class="field">
+        <label>اسم الطالبة <span style="color:red">*</span></label>
+        <input type="text" id="commonStudentName" placeholder="الاسم الكامل" required>
+      </div>
+      <div class="field">
+        <label>المبلغ المطلوب (ريال سعودي) <span style="color:red">*</span></label>
+        <input type="number" id="commonAmount" placeholder="1500" value="1500" required>
+      </div>
+    </div>
+    
+    <div class="methods-nav">
+      <div class="method-tab active" onclick="switchMethod('card')">مدى / بطاقة ائتمانية</div>
+      <div class="method-tab" onclick="switchMethod('apple_pay')">Apple Pay</div>
+      <div class="method-tab" onclick="switchMethod('tamara')">تمارا (تقسيط)</div>
+      <div class="method-tab" onclick="switchMethod('geel_pay')">جيل باي</div>
+      <div class="method-tab" onclick="switchMethod('bank_transfer')">حوالة بنكية</div>
+      <div class="method-tab" onclick="switchMethod('cash')">دفع نقدي (في المدرسة)</div>
+    </div>
+    
+    <div class="checkout-body">
+      <!-- MADA / VISA Pane -->
+      <div class="method-pane active" id="pane-card">
+        <div class="demo-notice">بيئة تجريبية (Simulator) - استخدم أي أرقام وهمية للتجربة.</div>
+        <div class="cc-form">
+          <div class="cc-logos">
+            <svg width="40" height="30" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="#F0F4F8"/><path d="M10 24C10 21.8 11.8 20 14 20H26C28.2 20 30 21.8 30 24V28H10V24Z" fill="#005B94"/></svg>
+            <svg width="40" height="30" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="#F0F4F8"/><circle cx="16" cy="20" r="8" fill="#EB001B" fill-opacity="0.85"/><circle cx="24" cy="20" r="8" fill="#F79E1B" fill-opacity="0.85"/></svg>
+          </div>
+          <div class="field">
+            <label>رقم البطاقة</label>
+            <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" value="4111 1111 1111 1111">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label>تاريخ الانتهاء</label>
+              <input type="text" placeholder="MM/YY" value="12/30">
+            </div>
+            <div class="field">
+              <label>رمز الأمان (CVV)</label>
+              <input type="text" placeholder="123" maxlength="3" value="123">
+            </div>
+          </div>
+          <div class="field">
+            <label>الاسم على البطاقة</label>
+            <input type="text" placeholder="اسم حامل البطاقة" value="Ahmed Abdullah">
+          </div>
+          <button class="btn-submit" onclick="submitElectronic('mada')">دفع الآن 💳</button>
+        </div>
+      </div>
+      
+      <!-- Apple Pay Pane -->
+      <div class="method-pane" id="pane-apple_pay">
+        <div class="demo-notice">بيئة تجريبية (Simulator)</div>
+        <div style="text-align: center; padding: 40px;">
+          <svg width="60" height="60" viewBox="0 0 40 40" style="margin-bottom:20px;"><rect width="40" height="40" rx="8" fill="#000"/><path d="M22.5 16.5C22.5 15.2 23.5 14.1 24.8 13.9C24.1 13 23 12.5 21.9 12.5C19.2 12.5 17.8 14.1 17.8 14.1C17.8 14.1 16.5 12.5 14.2 12.5C12.1 12.5 10.2 14 10.2 17C10.2 21.7 14.4 27.5 17.8 27.5C21.1 27.5 24.8 21.5 24.8 17.5C24.8 17.1 24.7 16.8 24.6 16.5C23.4 16.6 22.5 16.5 22.5 16.5Z" fill="white"/><path d="M21.2 11.8C22.4 10.3 22.3 8.7 22.3 8.7C20.8 8.8 19.3 9.9 18.5 11.2C17.4 12.5 17.8 14 17.8 14C19.3 14 20.2 13 21.2 11.8Z" fill="white"/></svg>
+          <br>
+          <button class="btn-submit" style="background: #000; max-width: 300px;" onclick="submitElectronic('apple_pay')">الدفع بـ Apple Pay </button>
+        </div>
+      </div>
+
+      <!-- Tamara Pane -->
+      <div class="method-pane" id="pane-tamara">
+        <div class="demo-notice">بيئة تجريبية (Simulator)</div>
+        <div class="tamara-box">
+          <div class="tamara-title">تمارا - قسّم فاتورتك</div>
+          <p style="font-size: .9rem; margin-bottom: 20px;">ادفع دفعة أولى اليوم والباقي على دفعات متساوية بدون رسوم خفية.</p>
+          <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+            <span>الدفعة الأولى اليوم:</span>
+            <span id="tamaraFirst">500 ريال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:.85rem;">
+            <span>دفعتين إضافيتين:</span>
+            <span id="tamaraRest">500 ريال / شهر</span>
+          </div>
+          <button class="btn-submit" style="background: #D4A843; margin-top:30px;" onclick="submitElectronic('tamara')">المتابعة إلى تمارا</button>
+        </div>
+      </div>
+
+      <!-- Geel Pay Pane -->
+      <div class="method-pane" id="pane-geel_pay">
+        <div class="demo-notice">بيئة تجريبية (Simulator)</div>
+        <div class="geel-box">
+          <h3 style="color:var(--primary); font-family:var(--font-d); margin-bottom: 10px;">Geel Pay - جيل باي</h3>
+          <p style="font-size: .9rem; margin-bottom: 20px;">بوابة الدفع التعليمي الرائدة في السعودية. ادفع رسومك المدرسية بسهولة وأمان.</p>
+          <button class="btn-submit" style="background: var(--primary);" onclick="submitElectronic('geel_pay')">ادفع مع جيل باي</button>
+        </div>
+      </div>
+
+      <!-- Bank Transfer Pane -->
+      <div class="method-pane" id="pane-bank_transfer">
+        <div class="bank-box">
+          <h3 style="color:var(--primary); font-family:var(--font-d); margin-bottom: 8px;">حساب المدرسة للتحويل</h3>
+          <p style="font-size: .9rem;">بنك الراجحي - مدرسة رواد التعليمية</p>
+          <p style="font-size: .9rem;">الآيبان: SA1234567890123456789012</p>
+        </div>
+        <div class="field">
+          <label>صورة الإيصال <span style="color:red">*</span></label>
+          <input type="file" id="bankReceipt" accept="image/*">
+        </div>
+        <button class="btn-submit" onclick="submitBankTransfer()">إرسال الإيصال للاعتماد 📤</button>
+      </div>
+
+      <!-- Cash Pane -->
+      <div class="method-pane" id="pane-cash">
+        <div class="cash-box">
+          <div class="cash-icon">💵</div>
+          <h3 style="font-family:var(--font-d); color:var(--success); margin-bottom:10px;">الدفع النقدي في المدرسة</h3>
+          <p style="font-size: .9rem; color:var(--muted); margin-bottom: 20px;">سيتم تسجيل طلبك، ويرجى التوجه إلى قسم الحسابات في المدرسة لتسديد المبلغ نقداً خلال 3 أيام عمل.</p>
+          <button class="btn-submit" onclick="submitElectronic('cash')">تأكيد خيار الدفع النقدي</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000/api';
+
+  function switchMethod(methodId) {
+    document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.method-pane').forEach(p => p.classList.remove('active'));
+    
+    event.currentTarget.classList.add('active');
+    document.getElementById(`pane-${methodId}`).classList.add('active');
+  }
+
+  document.getElementById('commonAmount').addEventListener('input', function() {
+    const val = parseFloat(this.value) || 0;
+    document.getElementById('tamaraFirst').textContent = (val / 3).toFixed(2) + ' ريال';
+    document.getElementById('tamaraRest').textContent = (val / 3).toFixed(2) + ' ريال / شهر';
+  });
+
+  function getCommonData() {
+    const reg = document.getElementById('commonRegNum').value.trim();
+    const name = document.getElementById('commonStudentName').value.trim();
+    const amount = document.getElementById('commonAmount').value;
+
+    if (!reg || !name || !amount) {
+      alert('يرجى تعبئة الحقول الأساسية (رقم الطلب، الاسم، المبلغ) في أعلى الصفحة أولاً.');
+      return null;
+    }
+    return { registrationNumber: reg, studentName: name, amount: amount };
+  }
+
+  function showStatus(isSuccess, msg) {
+    const el = document.getElementById('statusMsg');
+    el.className = 'msg ' + (isSuccess ? 'success' : 'error');
+    el.textContent = msg;
+    if (isSuccess) {
+      document.getElementById('checkoutContainer').style.display = 'none';
+    }
+    window.scrollTo(0, 0);
+  }
+
+  // Handle Mada/Visa/ApplePay/Tamara/GeelPay/Cash (Simulated Checkout)
+  async function submitElectronic(method) {
+    const data = getCommonData();
+    if (!data) return;
+
+    data.paymentMethod = method;
+
+    try {
+      const res = await fetch(`${API_BASE}/payments/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        showStatus(true, result.message);
+      } else {
+        showStatus(false, result.message || 'حدث خطأ. يرجى المحاولة.');
+      }
+    } catch (err) {
+      showStatus(false, 'خطأ في الاتصال بالخادم.');
+    }
+  }
+
+  // Handle Bank Transfer (FileUpload)
+  async function submitBankTransfer() {
+    const data = getCommonData();
+    if (!data) return;
+
+    const fileInput = document.getElementById('bankReceipt');
+    if (!fileInput.files.length) {
+      alert('يرجى إرفاق صورة الإيصال البنكي.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('registrationNumber', data.registrationNumber);
+    formData.append('studentName', data.studentName);
+    formData.append('amount', data.amount);
+    formData.append('receipt', fileInput.files[0]);
+
+    try {
+      const res = await fetch(`${API_BASE}/payments/transfer`, {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        showStatus(true, result.message);
+      } else {
+        showStatus(false, result.message || 'حدث خطأ. يرجى المحاولة.');
+      }
+    } catch (err) {
+      showStatus(false, 'خطأ في الاتصال بالخادم.');
+    }
+  }
+</script>
+
+</body>
+</html>

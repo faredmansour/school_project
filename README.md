@@ -1,117 +1,177 @@
 # مدرسة رواد التعليمية — Full-Stack Website
 
-## 📋 تقسيم المشروع
-
-### ✅ Phase 1 — الأساس (منجز)
-**Frontend:**
-- `index.html` — Landing Page كاملة (Hero, About, Announcements, Payment, Social, Footer)
-- `register.html` — صفحة تسجيل الطلاب متعددة الخطوات مع validation
-
-**Backend (Express + MongoDB):**
-- `server.js` — Express app مع Helmet, Rate Limiting, CORS
-- `models/User.js` — نموذج المستخدمين (RBAC: super_admin / admin / editor)
-- `models/Announcement.js` — نموذج الإعلانات
-- `models/Student.js` — نموذج تسجيل الطالبات (auto registration number)
-- `routes/auth.js` — تسجيل دخول + JWT Access/Refresh tokens
-- `routes/announcements.js` — CRUD للإعلانات (public GET + protected POST/PUT/DELETE)
-- `routes/students.js` — تسجيل الطالبات + إرسال email تلقائي
-- `routes/settings.js` — إعدادات الموقع key-value
-- `config/email.js` — قوالب email HTML احترافية للتأكيد
+موقع مدرسة رواد التعليمية — مبني بـ **Express.js + MongoDB** للـ Backend وـ **HTML/CSS/JS** للـ Frontend.
 
 ---
 
-### 🔜 Phase 2 — الصفحات الخاصة
-**Frontend:**
-- `fees.html` — صفحة الرسوم (noindex/nofollow, رابط مباشر فقط)
-- `links.html` — صفحة Linktree مخصصة بتصميم هوية المدرسة
-- ربط Social Media API (Instagram Basic Display API)
+## 📁 هيكل المشروع
 
-**Backend:**
-- `routes/fees.js` — API لرفع/تحديث صور الرسوم
-- `routes/socialFeed.js` — جلب وتخزين منشورات السوشيال ميديا (cron job)
-- `models/SocialPost.js` — تخزين المنشورات للعرض
-- `middleware/upload.js` — Multer لرفع الصور
-
----
-
-### 🔜 Phase 3 — Admin Dashboard
-**Frontend:**
-- `admin/index.html` — لوحة التحكم الرئيسية
-- `admin/announcements.html` — إدارة الإعلانات
-- `admin/students.html` — قائمة الطلاب + تغيير الحالة
-- `admin/fees.html` — رفع صور الرسوم
-- `admin/settings.html` — إعدادات الموقع
-
-**Backend:**
-- `routes/reviews.js` — تقييمات الزوار (CRUD)
-- `models/Review.js` — نموذج التقييمات
-- Docker + nginx config
-- CI/CD pipeline (GitHub Actions)
+```
+school_project/
+│
+├── docker-compose.yml          # للنشر والتطوير بـ Docker
+│
+├── backend/
+│   ├── server.js               # نقطة الدخول: DB connect + listen
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── .env.example
+│   ├── scripts/
+│   │   └── seed.js             # إنشاء أول admin
+│   └── src/
+│       ├── app.js              # إعداد Express (middleware + routes)
+│       ├── config/
+│       │   ├── constants.js    # ROLES, GRADES, STATUSES...
+│       │   ├── db.js           # اتصال MongoDB
+│       │   └── email.js        # قوالب البريد الإلكتروني
+│       ├── models/
+│       │   ├── User.js
+│       │   ├── Student.js
+│       │   ├── Announcement.js
+│       │   ├── Review.js
+│       │   ├── SocialPost.js
+│       │   └── Settings.js
+│       ├── controllers/        # Business Logic
+│       │   ├── auth.controller.js
+│       │   ├── student.controller.js
+│       │   ├── announcement.controller.js
+│       │   ├── review.controller.js
+│       │   ├── fees.controller.js
+│       │   ├── social.controller.js
+│       │   └── settings.controller.js
+│       ├── routes/             # Route definitions only
+│       │   ├── index.js        # يجمع كل الـ routes
+│       │   ├── auth.routes.js
+│       │   ├── student.routes.js
+│       │   ├── announcement.routes.js
+│       │   ├── review.routes.js
+│       │   ├── fees.routes.js
+│       │   ├── social.routes.js
+│       │   └── settings.routes.js
+│       ├── middleware/
+│       │   ├── auth.js         # JWT protect + authorize
+│       │   ├── upload.js       # Multer
+│       │   ├── errorHandler.js # معالج مركزي للأخطاء
+│       │   └── validate.js     # express-validator middleware
+│       ├── validators/         # Validation rules
+│       │   ├── auth.validator.js
+│       │   ├── student.validator.js
+│       │   ├── announcement.validator.js
+│       │   └── review.validator.js
+│       └── utils/
+│           ├── asyncHandler.js # try/catch wrapper
+│           └── ApiResponse.js  # توحيد شكل الـ responses
+│
+└── frontend/
+    ├── index.html              # Landing Page
+    ├── register.html           # تسجيل الطلاب
+    ├── fees.html               # الرسوم الدراسية
+    ├── links.html              # صفحة الروابط
+    ├── admin/
+    │   └── index.html          # لوحة التحكم
+    └── assets/
+        ├── css/
+        │   └── variables.css   # CSS Design Tokens
+        └── js/
+            └── api.js          # Fetch wrapper مركزي
+```
 
 ---
 
 ## 🚀 تشغيل المشروع
 
-### Backend
+### الطريقة 1: تطوير محلي (بدون Docker)
+
 ```bash
+# Backend
 cd backend
 cp .env.example .env
-# عدّل .env بإعداداتك (MongoDB URI, Email credentials)
+# عدّل .env بإعداداتك
 npm install
-node scripts/seed.js   # إنشاء أول admin
-npm run dev            # أو npm start
+npm run seed    # إنشاء أول admin (مرة واحدة فقط)
+npm run dev     # يشغّل nodemon
 ```
 
-### Frontend
 ```bash
-# للتطوير: استخدم Live Server أو
+# Frontend
 cd frontend
 npx serve .
+# أو افتح index.html مباشرة في المتصفح
 ```
 
-### API Endpoints
+### الطريقة 2: Docker Compose
 
-| Method | Route | Auth | الوظيفة |
-|--------|-------|------|---------|
-| POST | `/api/auth/login` | ❌ | تسجيل الدخول |
-| POST | `/api/auth/refresh` | ❌ | تجديد token |
-| POST | `/api/auth/logout` | ✅ | تسجيل الخروج |
-| GET  | `/api/auth/me` | ✅ | بيانات المستخدم |
-| GET  | `/api/announcements` | ❌ | جلب الإعلانات النشطة |
-| GET  | `/api/announcements/admin` | ✅ | كل الإعلانات |
-| POST | `/api/announcements` | ✅ | إنشاء إعلان |
-| PUT  | `/api/announcements/:id` | ✅ | تعديل إعلان |
-| DELETE | `/api/announcements/:id` | ✅ Admin | حذف إعلان |
-| POST | `/api/students/register` | ❌ | تسجيل طالبة |
-| GET  | `/api/students` | ✅ Admin | قائمة الطلاب |
-| PATCH | `/api/students/:id/status` | ✅ Admin | تغيير حالة الطلب |
-| GET  | `/api/settings/public` | ❌ | إعدادات عامة |
-| PUT  | `/api/settings/:key` | ✅ Admin | تعديل إعداد |
+```bash
+cd school_project
+cp backend/.env.example backend/.env
+# عدّل backend/.env
+docker-compose up -d
+```
 
 ---
 
-## 🔐 Security Features
-- JWT Access Token (15min) + Refresh Token (7 days) rotation
-- RBAC: super_admin / admin / editor
-- Helmet.js headers
+## 🔌 API Endpoints
+
+| Method   | Route                          | Auth         | الوظيفة                    |
+|----------|--------------------------------|--------------|----------------------------|
+| `POST`   | `/api/auth/login`              | ❌           | تسجيل الدخول               |
+| `POST`   | `/api/auth/refresh`            | ❌           | تجديد token                |
+| `POST`   | `/api/auth/logout`             | ✅ Protected | تسجيل الخروج               |
+| `GET`    | `/api/auth/me`                 | ✅ Protected | بيانات المستخدم            |
+| `GET`    | `/api/announcements`           | ❌           | الإعلانات النشطة            |
+| `GET`    | `/api/announcements/admin`     | ✅ Editor+   | كل الإعلانات               |
+| `POST`   | `/api/announcements`           | ✅ Editor+   | إنشاء إعلان                |
+| `PUT`    | `/api/announcements/:id`       | ✅ Editor+   | تعديل إعلان                |
+| `DELETE` | `/api/announcements/:id`       | ✅ Admin+    | حذف إعلان                  |
+| `POST`   | `/api/students/register`       | ❌           | تسجيل طالبة                |
+| `GET`    | `/api/students`                | ✅ Admin+    | قائمة الطلاب               |
+| `PATCH`  | `/api/students/:id/status`     | ✅ Admin+    | تغيير حالة الطلب           |
+| `GET`    | `/api/reviews`                 | ❌           | التقييمات الموافق عليها     |
+| `POST`   | `/api/reviews`                 | ❌           | إرسال تقييم جديد            |
+| `GET`    | `/api/reviews/admin`           | ✅ Editor+   | كل التقييمات               |
+| `PATCH`  | `/api/reviews/:id/approve`     | ✅ Editor+   | الموافقة على تقييم          |
+| `DELETE` | `/api/reviews/:id`             | ✅ Admin+    | حذف تقييم                  |
+| `GET`    | `/api/fees`                    | ❌           | صور الرسوم الدراسية         |
+| `POST`   | `/api/fees/upload`             | ✅ Admin+    | رفع صورة رسوم              |
+| `DELETE` | `/api/fees/:filename`          | ✅ Admin+    | حذف صورة رسوم              |
+| `GET`    | `/api/social`                  | ❌           | منشورات السوشيال            |
+| `POST`   | `/api/social`                  | ✅ Editor+   | إضافة منشور يدوياً          |
+| `POST`   | `/api/social/sync`             | ✅ Editor+   | مزامنة من Instagram        |
+| `DELETE` | `/api/social/:id`              | ✅ Admin+    | حذف منشور                  |
+| `GET`    | `/api/settings/public`         | ❌           | إعدادات عامة               |
+| `PUT`    | `/api/settings/:key`           | ✅ Admin+    | تعديل إعداد                |
+| `GET`    | `/api/health`                  | ❌           | حالة الخادم                |
+
+---
+
+## 🔐 نظام الصلاحيات (RBAC)
+
+| الدور         | القراءة | الإضافة/التعديل | الحذف الحساس | الإعدادات |
+|---------------|---------|-----------------|--------------|-----------|
+| `editor`      | ✅      | ✅              | ❌           | ❌        |
+| `admin`       | ✅      | ✅              | ✅           | ✅        |
+| `super_admin` | ✅      | ✅              | ✅           | ✅        |
+
+---
+
+## 🛡️ Security Features
+
+- JWT Access Token (`15min`) + Refresh Token (`7d`) rotation
+- RBAC: `super_admin` / `admin` / `editor`
+- Helmet.js security headers
 - Rate limiting: 100 req/15min per IP
-- bcrypt password hashing (salt rounds: 12)
+- bcrypt password hashing (salt: 12 rounds)
 - Input validation via express-validator
+- Path traversal protection for file operations
 
 ---
 
-## 📁 Project Structure
+## 🏗️ Architecture
+
 ```
-school-project/
-├── backend/
-│   ├── server.js
-│   ├── .env.example
-│   ├── models/        (User, Announcement, Student)
-│   ├── routes/        (auth, announcements, students, settings)
-│   ├── middleware/    (auth.js)
-│   ├── config/        (email.js)
-│   └── scripts/       (seed.js)
-└── frontend/
-    ├── index.html     ← Landing Page
-    └── register.html  ← Student Registration Form
+Request → Route → [Validators] → [validate middleware] → Controller → Model → Response
+                                                            ↓
+                                                     asyncHandler (no try/catch)
+                                                            ↓
+                                                     errorHandler middleware
 ```

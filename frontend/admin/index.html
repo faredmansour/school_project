@@ -236,6 +236,9 @@
       <li class="menu-item" id="menu-fees" onclick="switchView('fees')">
         <a href="#"><span>💰</span> جداول الرسوم</a>
       </li>
+      <li class="menu-item" id="menu-payments" onclick="switchView('payments')">
+        <a href="#"><span>💳</span> طلبات الدفع والمطابقة</a>
+      </li>
       <li class="menu-item" id="menu-reviews" onclick="switchView('reviews')">
         <a href="#"><span>⭐</span> مراجعة التقييمات</a>
       </li>
@@ -396,6 +399,33 @@
           </div>
           <div class="gallery-grid" id="feesGallery">
             <!-- Loaded by JS -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- ── VIEW: Payments ─────────────────────────────────────── -->
+      <div class="view-pane" id="view-payments">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">إدارة طلبات الدفع والحوالات البنكية</h3>
+          </div>
+          <div class="table-wrap">
+            <table id="paymentsTable">
+              <thead>
+                <tr>
+                  <th>رقم التسجيل</th>
+                  <th>اسم الطالبة</th>
+                  <th>المبلغ</th>
+                  <th>طريقة الدفع</th>
+                  <th>تاريخ العملية</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTableBody">
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -578,6 +608,7 @@ function checkAuth() {
     fetchAnnouncements();
     fetchFees();
     fetchReviews();
+    fetchPayments();
     loadSettings();
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
@@ -630,6 +661,7 @@ const viewTitles = {
   students: 'إدارة طلبات الطالبات',
   announcements: 'إدارة الإعلانات والعروض',
   fees: 'إدارة جداول الرسوم',
+  payments: 'إدارة طلبات الدفع',
   reviews: 'مراجعة التقييمات وآراء أولياء الأمور',
   settings: 'إعدادات الموقع والسوشيال ميديا'
 };
@@ -647,6 +679,7 @@ function switchView(viewName) {
   if (viewName === 'students') fetchStudents();
   if (viewName === 'announcements') fetchAnnouncements();
   if (viewName === 'fees') fetchFees();
+  if (viewName === 'payments') fetchPayments();
   if (viewName === 'reviews') fetchReviews();
 }
 
@@ -1201,6 +1234,80 @@ async function triggerSync() {
     alert(data.message);
   } catch (err) {
     alert('حدث خطأ في المزامنة.');
+  }
+}
+
+// ── Payments Management ──────────────────────────────────────────
+async function fetchPayments() {
+  try {
+    const res = await fetch('/api/payments', { headers: getHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      renderPaymentsList(data.data);
+    }
+  } catch (err) {
+    console.error('Payments loading failed', err);
+  }
+}
+
+function renderPaymentsList(list) {
+  const tbody = document.getElementById('paymentsTableBody');
+  const statusTranslations = {
+    pending: 'قيد الانتظار',
+    approved: 'مقبول',
+    rejected: 'مرفوض'
+  };
+  const methodTranslations = {
+    bank_transfer: '🏦 حوالة بنكية',
+    mada: '💳 مدى',
+    visa: '💳 فيزا/ماستركارد',
+    apple_pay: ' Apple Pay',
+    tamara: '🛍️ تمارا',
+    geel_pay: '🎓 جيل باي',
+    cash: '💵 نقدي'
+  };
+  
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">لا توجد طلبات دفع.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = list.map(p => `
+    <tr>
+      <td><strong>${p.registrationNumber}</strong></td>
+      <td>${p.studentName}</td>
+      <td>${p.amount} ريال</td>
+      <td style="font-weight:bold;">${methodTranslations[p.paymentMethod] || p.paymentMethod}</td>
+      <td>${new Date(p.createdAt).toLocaleDateString('ar-SA')}</td>
+      <td><span class="status-badge status-${p.status}">${statusTranslations[p.status]}</span></td>
+      <td>
+        ${p.receiptUrl ? `<a href="${p.receiptUrl}" target="_blank" class="btn btn-outline" style="padding:4px 8px; font-size:.8rem;">👁️ عرض الإيصال</a>` : ''}
+        ${p.status === 'pending' ? `
+          <button class="btn btn-success" style="padding:4px 8px; font-size:.8rem; margin-right:4px;" onclick="changePaymentStatus('${p._id}', 'approved')">✅ قبول</button>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:.8rem; margin-right:4px;" onclick="changePaymentStatus('${p._id}', 'rejected')">❌ رفض</button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function changePaymentStatus(id, newStatus) {
+  if (!confirm('هل أنت متأكد من تغيير حالة طلب الدفع؟')) return;
+  
+  try {
+    const res = await fetch(`/api/payments/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...getHeaders() },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if (data.success) {
+      fetchPayments();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert('حدث خطأ في تحديث الحالة.');
   }
 }
 
